@@ -1,0 +1,43 @@
+# Ripgrep configuration file
+# Set via: export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+
+# Smart case - case insensitive unless uppercase letters are used
+--smart-case
+
+# Follow symbolic links
+--follow
+
+# Search hidden files and directories
+--hidden
+
+# Don't search these directories
+--glob=!.git/*
+--glob=!node_modules/*
+--glob=!.venv/*
+--glob=!venv/*
+--glob=!__pycache__/*
+--glob=!*.pyc
+--glob=!.cache/*
+--glob=!build/*
+--glob=!dist/*
+--glob=!target/*
+--glob=!.DS_Store
+--glob=!*.swp
+--glob=!*.swo
+
+# File type associations
+--type-add=web:*.{html,css,js,jsx,ts,tsx,vue}
+--type-add=config:*.{json,yaml,yml,toml,ini,conf}
+
+# Max columns to prevent huge lines from slowing things down
+--max-columns=500
+
+# Show line numbers
+--line-number
+
+# Use colors
+--colors=path:fg:green
+--colors=path:style:bold
+--colors=line:fg:yellow
+--colors=match:fg:red
+--colors=match:style:bold

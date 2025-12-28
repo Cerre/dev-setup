@@ -84,6 +84,8 @@ export PATH=$HOME/.fzf/bin:$HOME/bin:/usr/local/bin:$HOME/scripts:$HOME/.local/b
 # zig
 export PATH=$PATH:~/.local/bin/zig
 
+# Ripgrep config
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 # User configuration
 

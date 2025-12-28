@@ -28,6 +28,7 @@ remove_symlink() {
 echo "=== Removing symlinks ==="
 remove_symlink "$HOME/.zshrc"
 remove_symlink "$HOME/.fzf.zsh"
+remove_symlink "$HOME/.ripgreprc"
 remove_symlink "$HOME/.tmux.conf"
 remove_symlink "$HOME/.config/nvim"
 

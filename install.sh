@@ -60,6 +60,10 @@ echo "=== Setting up fzf ==="
 create_symlink "$DOTFILES_DIR/fzf/fzf.zsh" "$HOME/.fzf.zsh"
 
 echo ""
+echo "=== Setting up ripgrep ==="
+create_symlink "$DOTFILES_DIR/ripgrep/ripgreprc" "$HOME/.ripgreprc"
+
+echo ""
 echo "=== Setting up tmux ==="
 create_symlink "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
