@@ -1,0 +1,5 @@
+{
+    "explorer.confirmDelete": false,
+    "continue.enableTabAutocomplete": false,
+    "zig.zls.enabled": "on"
+}

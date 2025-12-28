@@ -1,0 +1,27 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor backup files
+*~
+*.swp
+*.swo
+*.swn
+
+# VS Code workspace storage
+vscode/workspaceStorage/
+vscode/globalStorage/
+vscode/History/
+
+# Neovim plugin manager directories
+nvim/lazy-lock.json
+
+# Sensitive data
+*.secret
+*.key
+.env

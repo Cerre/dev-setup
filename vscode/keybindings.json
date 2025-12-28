@@ -1,0 +1,47 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+right",
+        "command": "cursorLineEnd"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "cursorLineEndSelect"
+    },
+    {
+        "key": "alt+right",
+        "command": "cursorWordEndRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "-cursorWordEndRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+right",
+        "command": "cursorWordEndRightSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "-cursorWordEndRightSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "cursorLineStart"
+    },
+    {
+        "key": "ctrl+shift+left",
+        "command": "cursorLineStartSelect"
+    },
+    {
+        "key": "alt+left",
+        "command": "cursorWordStartLeft"
+    },
+    {
+        "key": "shift+alt+left",
+        "command": "cursorWordStartLeftSelect"
+    }
+]
