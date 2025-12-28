@@ -177,4 +177,6 @@ zle -N _fzf_tag_search
 bindkey '^p' _fzf_file_search
 bindkey '^f' _fzf_rg_search
 bindkey '^e' _fzf_tag_search
-setxkbmap us
+
+# Set keyboard layout (only if setxkbmap is available)
+command -v setxkbmap >/dev/null 2>&1 && setxkbmap us
