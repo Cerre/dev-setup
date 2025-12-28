@@ -4,11 +4,12 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 
 ## Contents
 
-- **zsh**: Zsh shell configuration
-- **tmux**: Terminal multiplexer configuration
+- **zsh**: Zsh shell configuration with fzf + ripgrep integration
+- **tmux**: Terminal multiplexer configuration with vim-like keybindings
 - **neovim**: Neovim editor configuration
 - **vscode**: Visual Studio Code settings, keybindings, and snippets
 - **fzf**: Fuzzy finder configuration
+- **ripgrep**: Smart search configuration
 
 ## Prerequisites
 
@@ -18,20 +19,23 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 - tmux
 - neovim
 - fzf
+- ripgrep
+- ruby (for tmux-jump plugin)
+- xclip (Linux only, for clipboard integration)
 
 ### macOS specific
 ```bash
-brew install git zsh tmux neovim fzf
+brew install git zsh tmux neovim fzf ripgrep ruby
 ```
 
 ### Linux (Debian/Ubuntu)
 ```bash
-sudo apt install git zsh tmux neovim fzf
+sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip
 ```
 
 ### Linux (Arch)
 ```bash
-sudo pacman -S git zsh tmux neovim fzf
+sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip
 ```
 
 ## Installation
@@ -130,6 +134,37 @@ git add .
 git commit -m "Update configuration"
 git push
 ```
+
+## Testing
+
+### Test Installation with Docker
+
+Before deploying to a new machine, you can test the installation in a clean Docker container:
+
+```bash
+# Build and test
+./test-install.sh
+
+# Then run the container interactively
+docker run -it --rm dotfiles-test
+
+# Or test specific commands
+docker run --rm dotfiles-test zsh -c 'ls -la ~/.zshrc ~/.tmux.conf'
+docker run -it --rm dotfiles-test tmux
+```
+
+This creates a fresh Ubuntu 22.04 environment, installs all dependencies, and runs your install script - exactly like setting up a new machine.
+
+### For Ansible/Automation
+
+If you're using Ansible for work, you can create a playbook that:
+1. Clones this repository
+2. Installs prerequisites (zsh, tmux, neovim, fzf, ripgrep, ruby, xclip)
+3. Installs Oh My Zsh and fzf
+4. Runs the install script
+5. Installs TPM and tmux plugins
+
+The Dockerfile.test serves as a reference for the exact steps needed.
 
 ## Platform-Specific Notes
 

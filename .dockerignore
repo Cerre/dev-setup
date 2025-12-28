@@ -1,0 +1,5 @@
+# Don't copy these to Docker build context
+.git
+*.md
+README.md
+.gitignore

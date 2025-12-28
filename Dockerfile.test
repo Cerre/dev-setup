@@ -1,0 +1,45 @@
+# Dockerfile for testing dotfiles installation
+FROM ubuntu:22.04
+
+# Install basic dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    zsh \
+    tmux \
+    neovim \
+    fzf \
+    ripgrep \
+    xclip \
+    curl \
+    wget \
+    ruby \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a test user (similar to a fresh system)
+RUN useradd -m -s /bin/zsh testuser
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Copy dotfiles into the container
+COPY --chown=testuser:testuser . /home/testuser/dotfiles
+
+# Install Oh My Zsh (required by the zshrc)
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# Install fzf
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git /home/testuser/.fzf && \
+    /home/testuser/.fzf/install --all --no-bash --no-fish
+
+# Install TPM (Tmux Plugin Manager)
+RUN git clone https://github.com/tmux-plugins/tpm /home/testuser/.tmux/plugins/tpm
+
+# Run the dotfiles install script
+RUN cd /home/testuser/dotfiles && ./install.sh
+
+# Set zsh as default shell
+ENV SHELL=/bin/zsh
+
+# Default command - start zsh
+CMD ["/bin/zsh"]
