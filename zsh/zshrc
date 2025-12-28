@@ -180,3 +180,6 @@ bindkey '^e' _fzf_tag_search
 
 # Set keyboard layout (only if setxkbmap is available)
 command -v setxkbmap >/dev/null 2>&1 && setxkbmap us
+# Caps Lock: Escape when tapped, Ctrl when held
+setxkbmap -option ctrl:nocaps
+xcape -e "Control_L=Escape" -t 200 &
