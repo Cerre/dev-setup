@@ -1,8 +1,13 @@
 # Dockerfile for testing dotfiles installation
 FROM ubuntu:22.04
 
+# Add Neovim stable PPA for version 0.9+
+RUN apt-get update && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:neovim-ppa/stable -y \
+    && apt-get update
+
 # Install basic dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     git \
     zsh \
     tmux \

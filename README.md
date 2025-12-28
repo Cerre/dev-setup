@@ -17,7 +17,7 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 - git
 - zsh
 - tmux
-- neovim
+- neovim (0.8+ required for Kickstart config)
 - fzf
 - ripgrep
 - ruby (for tmux-jump plugin)
@@ -30,6 +30,11 @@ brew install git zsh tmux neovim fzf ripgrep ruby
 
 ### Linux (Debian/Ubuntu)
 ```bash
+# Add Neovim stable PPA for version 0.9+
+sudo add-apt-repository ppa:neovim-ppa/stable
+sudo apt update
+
+# Install all dependencies
 sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip
 ```
 
