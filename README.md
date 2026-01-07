@@ -318,6 +318,99 @@ Since both use the same keybindings, switching between them has zero context-swi
 - Disable heavy plugins in VS Code if needed
 - Check VS Code's Neovim extension settings
 
+## Quick Debug Setup from Terminal
+
+Quickly set up debug configurations from your terminal. Run your command, then open VS Code and press F5 to debug.
+
+### Usage
+
+```bash
+# Basic usage - saves debug config
+vdsetup script.py
+
+# With arguments - saves them too!
+vdsetup script.py --input data.txt --verbose
+
+# Short alias
+vds script.py arg1 arg2
+```
+
+### How It Works
+
+1. Detects file type (Python, JavaScript, TypeScript)
+2. Creates/updates `.vscode/launch.json` with your script and arguments
+3. YOU open VS Code when ready
+4. Press F5 (or `<space>ds`) to start debugging
+
+### Example Workflow
+
+```bash
+# You're working on a Python script in terminal
+cd ~/projects/my-app
+python script.py --config settings.json  # Test it first
+
+# Something's wrong, need to debug
+vdsetup script.py --config settings.json  # Saves debug config
+
+# Output shows:
+# ✅ Debug configuration saved!
+# Next steps:
+#   1. Open VS Code: code ~/projects/my-app
+#   2. Open the script: script.py
+#   3. Set breakpoints where you want (F9)
+#   4. Press F5 to start debugging!
+
+# Now YOU open VS Code
+code .  # or it's already open
+
+# Set breakpoints (<space>db or F9)
+# Press F5 to start debugging with saved arguments
+# Use F10 (step over), F11 (step into), <space>dc (continue)
+```
+
+### Supported Languages
+
+- **Python** (.py) - Uses debugpy
+- **JavaScript/Node** (.js, .mjs) - Uses node debugger
+- **TypeScript** (.ts) - Uses node debugger
+
+### Requirements
+
+- VS Code Python extension (for Python debugging)
+- VS Code installed and in PATH as `code`
+
+## MCP Server Integration (Claude AI)
+
+Model Context Protocol (MCP) servers give Claude enhanced capabilities to interact with your codebase, git history, and GitHub.
+
+### Configured Servers
+
+**Filesystem** - Allows Claude to read/search files in your home directory
+**Git** - Gives Claude access to git history, diffs, and repository info
+**GitHub** - Enables Claude to interact with GitHub APIs (requires token)
+
+### Setup GitHub Token (Optional)
+
+1. Create a GitHub Personal Access Token:
+   - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Generate new token with `repo` scope
+
+2. Add to your environment:
+   ```bash
+   echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your_token_here"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+Or update `mcp.json` directly with your token.
+
+### What This Enables
+
+When using Claude in VS Code:
+- "Show me the git history for this file"
+- "Search for all TODO comments in the codebase"
+- "What changed in the last 5 commits?"
+- "Create a GitHub issue for this bug"
+
 ## Troubleshooting
 
 ### Symlinks not working

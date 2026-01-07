@@ -217,3 +217,120 @@ command -v setxkbmap >/dev/null 2>&1 && setxkbmap us
 # Caps Lock: Escape when tapped, Ctrl when held
 setxkbmap -option ctrl:nocaps
 xcape -e "Control_L=Escape" -t 200 &
+
+# ============================================
+# Quick Debug Setup for VS Code
+# ============================================
+
+# Usage: vdsetup script.py [args...]
+# Creates launch.json for debugging, then YOU open VS Code and press F5
+function vdsetup() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: vdsetup <script_file> [args...]"
+        echo "Example: vdsetup script.py --input data.txt --verbose"
+        echo ""
+        echo "This creates .vscode/launch.json with your command."
+        echo "Then open VS Code and press F5 to debug!"
+        return 1
+    fi
+
+    local script_path="$1"
+    shift  # Remove first arg, remaining args will be passed to script
+    local script_args=("$@")
+
+    # Get absolute path
+    script_path=$(realpath "$script_path")
+
+    if [[ ! -f "$script_path" ]]; then
+        echo "❌ Error: File not found: $script_path"
+        return 1
+    fi
+
+    local script_dir=$(dirname "$script_path")
+    local script_name=$(basename "$script_path")
+    local script_ext="${script_name##*.}"
+
+    # Detect debugger type based on file extension
+    local debugger_type=""
+    local program_args="[]"
+
+    case "$script_ext" in
+        py)
+            debugger_type="debugpy"
+            if [[ ${#script_args[@]} -gt 0 ]]; then
+                program_args=$(printf '"%s",' "${script_args[@]}")
+                program_args="[${program_args%,}]"
+            fi
+            ;;
+        js|ts|mjs)
+            debugger_type="node"
+            if [[ ${#script_args[@]} -gt 0 ]]; then
+                program_args=$(printf '"%s",' "${script_args[@]}")
+                program_args="[${program_args%,}]"
+            fi
+            ;;
+        *)
+            echo "❌ Error: Unsupported file type: .$script_ext"
+            echo "Supported: .py, .js, .ts, .mjs"
+            return 1
+            ;;
+    esac
+
+    # Create/update launch.json
+    local launch_json="$script_dir/.vscode/launch.json"
+    mkdir -p "$script_dir/.vscode"
+
+    if [[ "$debugger_type" == "debugpy" ]]; then
+        cat > "$launch_json" << EOF
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: $script_name",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "$script_path",
+      "console": "integratedTerminal",
+      "args": $program_args,
+      "cwd": "$script_dir",
+      "justMyCode": true
+    }
+  ]
+}
+EOF
+    elif [[ "$debugger_type" == "node" ]]; then
+        cat > "$launch_json" << EOF
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: $script_name",
+      "type": "node",
+      "request": "launch",
+      "program": "$script_path",
+      "console": "integratedTerminal",
+      "args": $program_args,
+      "cwd": "$script_dir"
+    }
+  ]
+}
+EOF
+    fi
+
+    echo "✅ Debug configuration saved!"
+    echo ""
+    echo "📁 Location: $launch_json"
+    echo "🐍 Script: $script_name"
+    if [[ ${#script_args[@]} -gt 0 ]]; then
+        echo "📋 Args: ${script_args[@]}"
+    fi
+    echo ""
+    echo "Next steps:"
+    echo "  1. Open VS Code: code $script_dir"
+    echo "  2. Open the script: $script_name"
+    echo "  3. Set breakpoints where you want (F9 or <space>db)"
+    echo "  4. Press F5 (or <space>ds) to start debugging!"
+}
+
+# Alias for convenience
+alias vds='vdsetup'
