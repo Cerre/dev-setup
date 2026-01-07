@@ -68,6 +68,7 @@ if [ -d "$(dirname "$VSCODE_USER_DIR")" ] || [ "$DRY_RUN" = true ]; then
     link_file "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER_DIR/settings.json"
     link_file "$DOTFILES_DIR/vscode/keybindings.json" "$VSCODE_USER_DIR/keybindings.json"
     link_file "$DOTFILES_DIR/vscode/mcp.json" "$VSCODE_USER_DIR/mcp.json"
+    link_file "$DOTFILES_DIR/vscode/extensions.json" "$VSCODE_USER_DIR/extensions.json"
     link_file "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER_DIR/snippets"
 else
     echo "  Skipping VS Code (not installed or directory not found)"

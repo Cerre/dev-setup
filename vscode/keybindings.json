@@ -1,5 +1,135 @@
 // Place your key bindings in this file to override the defaults
 [
+    // ============================================
+    // Neovim Leader Key Mappings (<space> prefix)
+    // ============================================
+
+    // File Navigation (Telescope equivalents)
+    {
+        "key": "space s f",
+        "command": "workbench.action.quickOpen",
+        "when": "neovim.mode == normal"
+    },
+    {
+        "key": "space s g",
+        "command": "workbench.action.findInFiles",
+        "when": "neovim.mode == normal"
+    },
+    {
+        "key": "space space",
+        "command": "workbench.action.showAllEditors",
+        "when": "neovim.mode == normal"
+    },
+    {
+        "key": "space s h",
+        "command": "workbench.action.showCommands",
+        "when": "neovim.mode == normal"
+    },
+    {
+        "key": "space s w",
+        "command": "workbench.action.findInFiles",
+        "args": {
+            "query": "${selectedText}"
+        },
+        "when": "neovim.mode == normal"
+    },
+
+    // File Explorer (Oil.nvim equivalent)
+    {
+        "key": "-",
+        "command": "workbench.files.action.focusFilesExplorer",
+        "when": "neovim.mode == normal && !filesExplorerFocus"
+    },
+    {
+        "key": "-",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "neovim.mode == normal && filesExplorerFocus"
+    },
+
+    // Current Buffer Search
+    {
+        "key": "space /",
+        "command": "actions.find",
+        "when": "neovim.mode == normal"
+    },
+
+    // ============================================
+    // LSP Keybindings (matching Neovim gr* prefix)
+    // ============================================
+    {
+        "key": "g r d",
+        "command": "editor.action.revealDefinition",
+        "when": "neovim.mode == normal && editorHasDefinitionProvider && editorTextFocus"
+    },
+    {
+        "key": "g r r",
+        "command": "editor.action.goToReferences",
+        "when": "neovim.mode == normal && editorHasReferenceProvider && editorTextFocus"
+    },
+    {
+        "key": "g r i",
+        "command": "editor.action.goToImplementation",
+        "when": "neovim.mode == normal && editorHasImplementationProvider && editorTextFocus"
+    },
+    {
+        "key": "g r n",
+        "command": "editor.action.rename",
+        "when": "neovim.mode == normal && editorHasRenameProvider && editorTextFocus"
+    },
+    {
+        "key": "g r a",
+        "command": "editor.action.quickFix",
+        "when": "neovim.mode == normal && editorHasCodeActionsProvider && editorTextFocus"
+    },
+    {
+        "key": "g r t",
+        "command": "editor.action.goToTypeDefinition",
+        "when": "neovim.mode == normal && editorHasTypeDefinitionProvider && editorTextFocus"
+    },
+
+    // Hover (K in Neovim)
+    {
+        "key": "shift+k",
+        "command": "editor.action.showHover",
+        "when": "neovim.mode == normal && editorTextFocus"
+    },
+
+    // ============================================
+    // Debugger Shortcuts (VS Code specific)
+    // ============================================
+    {
+        "key": "space d b",
+        "command": "editor.debug.action.toggleBreakpoint",
+        "when": "neovim.mode == normal && editorTextFocus"
+    },
+    {
+        "key": "space d c",
+        "command": "workbench.action.debug.continue",
+        "when": "neovim.mode == normal"
+    },
+    {
+        "key": "space d s",
+        "command": "workbench.action.debug.start",
+        "when": "neovim.mode == normal && !inDebugMode"
+    },
+    {
+        "key": "space d x",
+        "command": "workbench.action.debug.stop",
+        "when": "neovim.mode == normal && inDebugMode"
+    },
+
+    // ============================================
+    // Terminal Toggle
+    // ============================================
+    {
+        "key": "ctrl+`",
+        "command": "workbench.action.terminal.toggleTerminal",
+        "when": "neovim.mode == normal || neovim.mode == insert"
+    },
+
+    // ============================================
+    // Original Non-Vim Keybindings (preserved)
+    // ============================================
     {
         "key": "ctrl+right",
         "command": "cursorLineEnd"

@@ -205,6 +205,94 @@ The Dockerfile.test serves as a reference for the exact steps needed.
 - VS Code User directory is at `~/.config/Code/User/`
 - Ensure you have the required packages installed for your distribution
 
+## VS Code + Neovim Integration
+
+This setup integrates your Neovim configuration directly into VS Code using the VSCode Neovim extension. You get the best of both worlds: Neovim's editing power with VS Code's debugging, Copilot, and GUI features.
+
+### Setup
+
+1. Install VS Code (if not already installed)
+2. Run `./install.sh` - this will symlink all VS Code configs including extensions.json
+3. Open VS Code - it will prompt you to install recommended extensions
+4. Install the "VSCode Neovim" extension (should be recommended automatically)
+5. Restart VS Code
+
+### How It Works
+
+- **Editing Engine**: VS Code uses your actual Neovim binary (from `~/.config/nvim/init.lua`)
+- **Keybindings**: Your Neovim leader key mappings work in VS Code
+- **Muscle Memory**: Same shortcuts as terminal Neovim
+
+### Key Mappings
+
+All your Neovim keybindings work in VS Code:
+
+**File Navigation** (Telescope → VS Code equivalents):
+- `<space>sf` - Quick Open (file finder)
+- `<space>sg` - Search in files (grep)
+- `<space><space>` - Show all open editors (buffers)
+- `<space>sh` - Command palette (help)
+- `-` - Toggle file explorer focus (Oil.nvim equivalent)
+
+**LSP Operations** (matching your Neovim `gr*` prefix):
+- `grd` - Go to definition
+- `grr` - Find references
+- `gri` - Go to implementation
+- `grn` - Rename symbol
+- `gra` - Code actions (quick fix)
+- `grt` - Go to type definition
+- `K` - Show hover documentation
+
+**Debugging** (VS Code specific):
+- `<space>db` - Toggle breakpoint
+- `<space>ds` - Start debugging
+- `<space>dc` - Continue
+- `<space>dx` - Stop debugging
+
+**Terminal**:
+- `Ctrl+\`` - Toggle integrated terminal
+
+### Editor Features
+
+- **Relative line numbers** - Just like Neovim
+- **Vim modes** - Normal, Insert, Visual with proper cursor shapes
+- **System clipboard** - Yank/paste works across apps
+- **Smart suggestions** - Works with Vim motions
+
+### Workflow Recommendations
+
+Use **terminal Neovim** for:
+- Quick file edits
+- Fast navigation
+- Terminal-based workflows
+- Lightweight operations
+
+Use **VS Code + Neovim** for:
+- Visual debugging sessions
+- GitHub Copilot assistance
+- Complex refactoring with GUI
+- Multi-file project navigation
+- Language-specific tooling
+
+Since both use the same keybindings, switching between them has zero context-switching cost.
+
+### Troubleshooting
+
+**Neovim extension not working:**
+- Check that Neovim is installed: `which nvim`
+- Verify path in settings.json matches your Neovim location
+- Check VS Code output panel for errors (View → Output → Neovim)
+
+**Keybindings not working:**
+- Ensure you're in normal mode (press `Esc`)
+- Check that keybindings.json is properly symlinked
+- Verify `neovim.mode` context in keybindings
+
+**Performance issues:**
+- Some Neovim plugins may not work well in VS Code context
+- Disable heavy plugins in VS Code if needed
+- Check VS Code's Neovim extension settings
+
 ## Troubleshooting
 
 ### Symlinks not working

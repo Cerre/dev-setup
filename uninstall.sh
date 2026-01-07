@@ -41,6 +41,7 @@ fi
 remove_symlink "$VSCODE_USER_DIR/settings.json"
 remove_symlink "$VSCODE_USER_DIR/keybindings.json"
 remove_symlink "$VSCODE_USER_DIR/mcp.json"
+remove_symlink "$VSCODE_USER_DIR/extensions.json"
 remove_symlink "$VSCODE_USER_DIR/snippets"
 
 echo ""
