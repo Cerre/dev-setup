@@ -49,7 +49,7 @@ sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/dotfiles
+   git clone https://github.com/Cerre/dev-setup.git ~/dotfiles
    cd ~/dotfiles
    ```
 

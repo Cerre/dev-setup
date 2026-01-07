@@ -5,6 +5,14 @@
 set -e  # Exit on error
 
 DOTFILES_DIR="$HOME/dotfiles"
+DRY_RUN=false
+
+# Check for dry-run flag
+if [[ "$1" == "--dry-run" ]]; then
+    DRY_RUN=true
+    echo "DRY RUN MODE - No changes will be made"
+    echo ""
+fi
 
 echo "Installing dotfiles from $DOTFILES_DIR..."
 
@@ -12,6 +20,14 @@ echo "Installing dotfiles from $DOTFILES_DIR..."
 link_file() {
     local src="$1"
     local dest="$2"
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY RUN] Would link $dest -> $src"
+        if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+            echo "  [DRY RUN] Would backup existing $dest to ${dest}.backup"
+        fi
+        return
+    fi
 
     # Backup existing file if it exists and isn't already a symlink
     if [ -e "$dest" ] && [ ! -L "$dest" ]; then
@@ -27,13 +43,40 @@ link_file() {
 # Ensure .config directory exists
 mkdir -p "$HOME/.config"
 
-# Create symlinks
+# Core configurations
 link_file "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 link_file "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 
+# FZF configuration
+link_file "$DOTFILES_DIR/fzf/fzf.zsh" "$HOME/.fzf.zsh"
+
+# Ripgrep configuration
+link_file "$DOTFILES_DIR/ripgrep/ripgreprc" "$HOME/.ripgreprc"
+
+# VS Code configuration (platform-specific)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
+else
+    # Linux
+    VSCODE_USER_DIR="$HOME/.config/Code/User"
+fi
+
+if [ -d "$(dirname "$VSCODE_USER_DIR")" ] || [ "$DRY_RUN" = true ]; then
+    mkdir -p "$VSCODE_USER_DIR"
+    link_file "$DOTFILES_DIR/vscode/settings.json" "$VSCODE_USER_DIR/settings.json"
+    link_file "$DOTFILES_DIR/vscode/keybindings.json" "$VSCODE_USER_DIR/keybindings.json"
+    link_file "$DOTFILES_DIR/vscode/mcp.json" "$VSCODE_USER_DIR/mcp.json"
+    link_file "$DOTFILES_DIR/vscode/snippets" "$VSCODE_USER_DIR/snippets"
+else
+    echo "  Skipping VS Code (not installed or directory not found)"
+fi
+
+echo ""
 echo "✓ Dotfiles installed successfully!"
 echo ""
 echo "Remember to:"
 echo "  - Restart your shell or run: source ~/.zshrc"
 echo "  - Restart tmux or run: tmux source ~/.tmux.conf"
+echo "  - Restart VS Code to apply new settings"
