@@ -53,20 +53,44 @@ sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip
    cd ~/dotfiles
    ```
 
-2. Run the install script:
+2. Install Oh My Zsh (required by zshrc):
+   ```bash
+   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+   ```
+
+3. Install fzf (fuzzy finder):
+   ```bash
+   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+   ~/.fzf/install
+   ```
+
+4. Install TPM (Tmux Plugin Manager):
+   ```bash
+   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+   ```
+
+5. Run the install script:
    ```bash
    ./install.sh
    ```
 
    This will:
-   - Back up existing configuration files to `~/dotfiles_backup_TIMESTAMP/`
+   - Back up existing configuration files to `.backup` files
    - Create symlinks from the dotfiles repo to their proper locations
    - Set up configurations for all included applications
 
-3. Restart your shell or source the new configuration:
+6. Install tmux plugins (open tmux and press `prefix + I`):
+   ```bash
+   tmux
+   # Inside tmux, press: Ctrl+Space then Shift+i
+   ```
+
+7. Restart your shell or source the new configuration:
    ```bash
    source ~/.zshrc
    ```
+
+   Neovim plugins will auto-install on first launch.
 
 ### Dry Run
 
