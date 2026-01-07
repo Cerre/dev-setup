@@ -74,6 +74,36 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+# ============================================
+# Vi Mode
+# ============================================
+# Enable vi mode
+bindkey -v
+
+# Reduce timeout for switching modes (10ms)
+export KEYTIMEOUT=1
+
+# Change cursor shape based on vi mode
+function zle-keymap-select {
+  if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'  # Block cursor for normal mode
+  elif [[ ${KEYMAP} == main ]] || [[ ${KEYMAP} == viins ]] || [[ ${KEYMAP} = '' ]] || [[ $1 = 'beam' ]]; then
+    echo -ne '\e[5 q'  # Beam cursor for insert mode
+  fi
+}
+zle -N zle-keymap-select
+
+# Start with beam cursor on new prompt
+function zle-line-init {
+  echo -ne "\e[5 q"
+}
+zle -N zle-line-init
+
+# Keep some emacs-style bindings for convenience
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
+bindkey '^R' history-incremental-search-backward
+
 # uv python package manager
 export PATH="$HOME/.local/bin:$PATH"
 
