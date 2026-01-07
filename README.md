@@ -13,7 +13,7 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 
 ## Prerequisites
 
-### Common
+### Common (Required)
 - git
 - zsh
 - tmux
@@ -23,9 +23,17 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 - ruby (for tmux-jump plugin)
 - xclip (Linux only, for clipboard integration)
 
+### Optional
+- **VS Code** - For Neovim integration with debugging/Copilot (install before running `./install.sh`)
+  - macOS: Download from [code.visualstudio.com](https://code.visualstudio.com) or `brew install --cask visual-studio-code`
+  - Linux: Download from [code.visualstudio.com](https://code.visualstudio.com) or use snap: `sudo snap install code --classic`
+
 ### macOS specific
 ```bash
 brew install git zsh tmux neovim fzf ripgrep ruby
+
+# Optional: VS Code
+brew install --cask visual-studio-code
 ```
 
 ### Linux (Debian/Ubuntu)
@@ -36,11 +44,17 @@ sudo apt update
 
 # Install all dependencies
 sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip
+
+# Optional: VS Code
+sudo snap install code --classic
 ```
 
 ### Linux (Arch)
 ```bash
 sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip
+
+# Optional: VS Code
+yay -S visual-studio-code-bin
 ```
 
 ## Installation
@@ -209,13 +223,24 @@ The Dockerfile.test serves as a reference for the exact steps needed.
 
 This setup integrates your Neovim configuration directly into VS Code using the VSCode Neovim extension. You get the best of both worlds: Neovim's editing power with VS Code's debugging, Copilot, and GUI features.
 
+**Note:** VS Code is optional. The dotfiles work perfectly fine without it for terminal-only workflows. Install VS Code only if you want the integrated experience.
+
 ### Setup
 
-1. Install VS Code (if not already installed)
-2. Run `./install.sh` - this will symlink all VS Code configs including extensions.json
+1. **Install VS Code first** (see Prerequisites section above)
+   - macOS: `brew install --cask visual-studio-code`
+   - Linux: `sudo snap install code --classic`
+   - Or download from [code.visualstudio.com](https://code.visualstudio.com)
+
+2. Run `./install.sh` - this will automatically detect VS Code and symlink all configs
+   - If VS Code is not installed, the script will skip VS Code configuration (no errors)
+
 3. Open VS Code - it will prompt you to install recommended extensions
+
 4. Install the "VSCode Neovim" extension (should be recommended automatically)
-5. Restart VS Code
+   - Or manually: Ctrl+Shift+X → search "VSCode Neovim" by asvetliakov → Install
+
+5. Restart VS Code completely for changes to take effect
 
 ### How It Works
 
