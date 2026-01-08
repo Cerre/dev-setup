@@ -13,19 +13,27 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 
 ## Prerequisites
 
-### Common (Required)
+**The install script automatically installs all required tools!** Just make sure you have `git` to clone the repository.
+
+### What Gets Auto-Installed
+
+**Core tools** (automatically installed if missing):
 - git
 - zsh
 - tmux
-- neovim (0.8+ required for Kickstart config)
+- neovim (0.8+)
 - fzf
 - ripgrep
 - ruby (for tmux-jump plugin)
 - xclip (Linux only, for clipboard integration)
 
-**Note:** The install script will automatically install the following if missing:
-- **Node.js and npm** - Required for Neovim LSP servers (pyright, dockerls)
-- **xcape** - Optional, for Caps Lock remapping (Escape when tapped, Ctrl when held)
+**Optional tools** (automatically installed if missing):
+- **Node.js and npm** - For Neovim LSP servers (pyright, dockerls)
+- **xcape** - For Caps Lock remapping (Escape when tapped, Ctrl when held)
+
+### Manual Installation (If Preferred)
+
+If you prefer to install dependencies manually before running the script:
 
 ### Optional
 - **VS Code** - For Neovim integration with debugging/Copilot (install before running `./install.sh`)
@@ -63,54 +71,52 @@ yay -S visual-studio-code-bin
 
 ## Installation
 
-### First Time Setup
+### Quick Start (Recommended)
 
-1. Clone this repository to `~/dotfiles` (important - the install script expects this exact path):
-   ```bash
-   git clone https://github.com/Cerre/dev-setup.git ~/dotfiles
-   cd ~/dotfiles
-   ```
+**One-command installation** - The script handles almost everything:
 
-   **Note:** The repository must be cloned to `~/dotfiles` exactly. If you clone it elsewhere or with a different name, the symlinks will break.
+```bash
+# 1. Clone the repository
+git clone https://github.com/Cerre/dev-setup.git ~/dotfiles
+cd ~/dotfiles
 
-2. Install Oh My Zsh (required by zshrc):
-   ```bash
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
+# 2. Run the install script (auto-installs all tools + creates symlinks)
+./install.sh
+```
 
-3. Install fzf (fuzzy finder):
-   ```bash
-   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-   ~/.fzf/install
-   ```
+**Note:** The repository must be cloned to `~/dotfiles` exactly. If you clone it elsewhere or with a different name, the symlinks will break.
 
-4. Install TPM (Tmux Plugin Manager):
-   ```bash
-   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-   ```
+The install script will:
+- ✅ Auto-install: git, zsh, tmux, neovim, fzf, ripgrep, ruby, xclip, Node.js/npm, xcape
+- ✅ Back up your existing configs to `.backup` files
+- ✅ Create symlinks from the dotfiles repo to proper locations
 
-5. Run the install script:
-   ```bash
-   ./install.sh
-   ```
+### Post-Installation Steps
 
-   This will:
-   - Back up existing configuration files to `.backup` files
-   - Create symlinks from the dotfiles repo to their proper locations
-   - Set up configurations for all included applications
+After the install script completes, run these additional setup commands:
 
-6. Install tmux plugins (open tmux and press `prefix + I`):
-   ```bash
-   tmux
-   # Inside tmux, press: Ctrl+Space then Shift+i
-   ```
+```bash
+# 1. Install Oh My Zsh (required by zshrc)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-7. Restart your shell or source the new configuration:
-   ```bash
-   source ~/.zshrc
-   ```
+# 2. Install fzf key bindings
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
 
-   Neovim plugins will auto-install on first launch.
+# 3. Install TPM (Tmux Plugin Manager)
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# 4. Restart your shell
+source ~/.zshrc
+```
+
+Then open tmux and install tmux plugins:
+```bash
+tmux
+# Inside tmux, press: Ctrl+a then Shift+i
+```
+
+Neovim plugins will auto-install on first launch.
 
 ### Dry Run
 
