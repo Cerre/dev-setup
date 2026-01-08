@@ -201,8 +201,6 @@ function _fzf_tag_search() {
     fi
 }
 
-alias se='setxkbmap se'
-alias us='setxkbmap us'
 # Bind the functions to keyboard shortcuts
 zle -N _fzf_file_search
 zle -N _fzf_rg_search
@@ -212,11 +210,15 @@ bindkey '^p' _fzf_file_search
 bindkey '^f' _fzf_rg_search
 bindkey '^e' _fzf_tag_search
 
-# Set keyboard layout (only if setxkbmap is available)
-command -v setxkbmap >/dev/null 2>&1 && setxkbmap us
-# Caps Lock: Escape when tapped, Ctrl when held
-setxkbmap -option ctrl:nocaps
-xcape -e "Control_L=Escape" -t 200 &
+# ============================================
+# Caps Lock Remapping
+# ============================================
+# Caps Lock: Escape when tapped (<200ms), Ctrl when held
+# Requires: xcape (installed by install.sh)
+if command -v xcape >/dev/null 2>&1 && command -v setxkbmap >/dev/null 2>&1; then
+    setxkbmap -option ctrl:nocaps
+    xcape -e "Control_L=Escape" -t 200 &
+fi
 
 # ============================================
 # Quick Debug Setup for VS Code

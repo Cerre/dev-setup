@@ -23,7 +23,9 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 - ruby (for tmux-jump plugin)
 - xclip (Linux only, for clipboard integration)
 
-**Note:** The install script will automatically install **Node.js and npm** if missing (required for Neovim LSP servers like pyright and dockerls)
+**Note:** The install script will automatically install the following if missing:
+- **Node.js and npm** - Required for Neovim LSP servers (pyright, dockerls)
+- **xcape** - Optional, for Caps Lock remapping (Escape when tapped, Ctrl when held)
 
 ### Optional
 - **VS Code** - For Neovim integration with debugging/Copilot (install before running `./install.sh`)

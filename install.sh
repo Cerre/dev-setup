@@ -20,6 +20,53 @@ echo ""
 # Check and install dependencies
 echo "Checking dependencies..."
 
+# Check for xcape (for Caps Lock remapping)
+if ! command -v xcape &> /dev/null; then
+    echo "⚠️  xcape not found (for Caps Lock → Ctrl/Escape remapping)"
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY RUN] Would install xcape"
+    else
+        echo "Installing xcape..."
+
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            if command -v brew &> /dev/null; then
+                brew install xcape
+            else
+                echo "⚠️  Homebrew not found. Skipping xcape (optional)"
+            fi
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            if command -v apt &> /dev/null; then
+                echo "Installing via apt (requires sudo)..."
+                sudo apt install -y xcape
+            elif command -v pacman &> /dev/null; then
+                echo "Installing via pacman (requires sudo)..."
+                sudo pacman -S --noconfirm xcape
+            elif command -v dnf &> /dev/null; then
+                echo "Installing via dnf (requires sudo)..."
+                sudo dnf install -y xcape
+            else
+                echo "⚠️  Package manager not detected. Skipping xcape (optional)"
+            fi
+        else
+            echo "⚠️  Unsupported OS. Skipping xcape (optional)"
+        fi
+
+        # Verify installation
+        if command -v xcape &> /dev/null; then
+            echo "✓ xcape installed"
+        else
+            echo "⚠️  xcape installation failed (optional feature)"
+        fi
+    fi
+else
+    echo "✓ xcape found"
+fi
+
+echo ""
+
 # Check for Node.js and npm (required for Neovim LSP servers)
 if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
     echo "⚠️  Node.js/npm not found (required for Neovim LSP servers like pyright, dockerls)"
