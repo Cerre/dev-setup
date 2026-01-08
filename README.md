@@ -23,6 +23,8 @@ Personal dotfiles for managing configuration across Linux and macOS systems.
 - ruby (for tmux-jump plugin)
 - xclip (Linux only, for clipboard integration)
 
+**Note:** The install script will automatically install **Node.js and npm** if missing (required for Neovim LSP servers like pyright and dockerls)
+
 ### Optional
 - **VS Code** - For Neovim integration with debugging/Copilot (install before running `./install.sh`)
   - macOS: Download from [code.visualstudio.com](https://code.visualstudio.com) or `brew install --cask visual-studio-code`
@@ -61,11 +63,13 @@ yay -S visual-studio-code-bin
 
 ### First Time Setup
 
-1. Clone this repository:
+1. Clone this repository to `~/dotfiles` (important - the install script expects this exact path):
    ```bash
    git clone https://github.com/Cerre/dev-setup.git ~/dotfiles
    cd ~/dotfiles
    ```
+
+   **Note:** The repository must be cloned to `~/dotfiles` exactly. If you clone it elsewhere or with a different name, the symlinks will break.
 
 2. Install Oh My Zsh (required by zshrc):
    ```bash

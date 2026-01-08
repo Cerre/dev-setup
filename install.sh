@@ -15,6 +15,64 @@ if [[ "$1" == "--dry-run" ]]; then
 fi
 
 echo "Installing dotfiles from $DOTFILES_DIR..."
+echo ""
+
+# Check and install dependencies
+echo "Checking dependencies..."
+
+# Check for Node.js and npm (required for Neovim LSP servers)
+if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
+    echo "⚠️  Node.js/npm not found (required for Neovim LSP servers like pyright, dockerls)"
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "  [DRY RUN] Would install nodejs and npm"
+    else
+        echo "Installing Node.js and npm..."
+
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            if command -v brew &> /dev/null; then
+                brew install node
+            else
+                echo "❌ Homebrew not found. Please install Node.js manually:"
+                echo "   Visit: https://nodejs.org or run: brew install node"
+                exit 1
+            fi
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            if command -v apt &> /dev/null; then
+                echo "Installing via apt (requires sudo)..."
+                sudo apt update && sudo apt install -y nodejs npm
+            elif command -v pacman &> /dev/null; then
+                echo "Installing via pacman (requires sudo)..."
+                sudo pacman -S --noconfirm nodejs npm
+            elif command -v dnf &> /dev/null; then
+                echo "Installing via dnf (requires sudo)..."
+                sudo dnf install -y nodejs npm
+            else
+                echo "❌ Package manager not detected. Please install Node.js manually:"
+                echo "   Visit: https://nodejs.org"
+                exit 1
+            fi
+        else
+            echo "❌ Unsupported OS. Please install Node.js manually:"
+            echo "   Visit: https://nodejs.org"
+            exit 1
+        fi
+
+        # Verify installation
+        if command -v node &> /dev/null && command -v npm &> /dev/null; then
+            echo "✓ Node.js $(node --version) and npm $(npm --version) installed"
+        else
+            echo "❌ Failed to install Node.js/npm"
+            exit 1
+        fi
+    fi
+else
+    echo "✓ Node.js $(node --version) and npm $(npm --version) found"
+fi
+
+echo ""
 
 # Function to create symlink with backup
 link_file() {
