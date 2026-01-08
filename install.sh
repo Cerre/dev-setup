@@ -104,8 +104,9 @@ if ! command -v nvim &> /dev/null; then
             brew install neovim || echo "⚠️  Failed to install neovim"
         elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
             if command -v apt &> /dev/null; then
-                # Try to add PPA for newer version
-                sudo add-apt-repository -y ppa:neovim-ppa/stable 2>/dev/null || true
+                # Add PPA for latest neovim (0.10+)
+                # Note: "unstable" PPA has the latest stable builds
+                sudo add-apt-repository -y ppa:neovim-ppa/unstable 2>/dev/null || true
                 sudo apt install -y neovim || echo "⚠️  Failed to install neovim"
             elif command -v pacman &> /dev/null; then
                 sudo pacman -S --noconfirm neovim || echo "⚠️  Failed to install neovim"

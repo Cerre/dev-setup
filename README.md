@@ -50,8 +50,9 @@ brew install --cask visual-studio-code
 
 ### Linux (Debian/Ubuntu)
 ```bash
-# Add Neovim stable PPA for version 0.9+
-sudo add-apt-repository ppa:neovim-ppa/stable
+# Add Neovim PPA for latest version (0.10+)
+# Note: The "unstable" PPA has the latest stable neovim builds
+sudo add-apt-repository ppa:neovim-ppa/unstable
 sudo apt update
 
 # Install all dependencies
