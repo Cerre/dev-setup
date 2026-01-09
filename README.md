@@ -16,6 +16,15 @@ sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip nodejs npm xcape
 sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip nodejs npm xcape
 ```
 
+**Optional: VS Code** (for neovim integration)
+```bash
+# Ubuntu/Debian
+sudo snap install code --classic
+
+# Then install VSCode Neovim extension
+# code --install-extension asvetliakov.vscode-neovim
+```
+
 ### 2. Clone and Install
 
 ```bash

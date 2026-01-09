@@ -32,6 +32,13 @@ link_file "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$DOTFILES_DIR/fzf/fzf.zsh" "$HOME/.fzf.zsh"
 link_file "$DOTFILES_DIR/ripgrep/ripgreprc" "$HOME/.ripgreprc"
 
+# VS Code (optional - only if installed)
+if [ -d "$HOME/.config/Code/User" ]; then
+    link_file "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json"
+    link_file "$DOTFILES_DIR/vscode/keybindings.json" "$HOME/.config/Code/User/keybindings.json"
+    echo "  ✓ VS Code configs linked"
+fi
+
 echo ""
 echo "✓ Dotfiles installed!"
 echo ""
