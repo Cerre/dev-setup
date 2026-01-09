@@ -25,3 +25,4 @@ nvim/lazy-lock.json
 *.secret
 *.key
 .env
+DEVOPS-COURSE.md
