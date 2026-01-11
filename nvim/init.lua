@@ -689,7 +689,25 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = 'openFilesOnly',
+                typeCheckingMode = 'standard', -- or 'basic', 'strict'
+              },
+            },
+          },
+          before_init = function(_, config)
+            -- Automatically detect and use local .venv
+            local venv_path = vim.fn.getcwd() .. '/.venv'
+            if vim.fn.isdirectory(venv_path) == 1 then
+              config.settings.basedpyright.analysis.pythonPath = venv_path .. '/bin/python'
+            end
+          end,
+        },
         dockerls = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -898,23 +916,18 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'tanvirtin/monokai.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
+      require('monokai').setup {
+        palette = require('monokai').pro, -- Use Monokai Pro palette (closest to Sublime)
       }
 
       -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'monokai'
 
       -- Dim inactive windows
-      vim.api.nvim_set_hl(0, 'NormalNC', { bg = '#1a1e30' })
+      vim.api.nvim_set_hl(0, 'NormalNC', { bg = '#1e1e1e' })
     end,
   },
 
