@@ -176,6 +176,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Toggle warning visibility (errors always visible)
+local show_warnings = false
+vim.keymap.set('n', '<leader>tw', function()
+  show_warnings = not show_warnings
+  vim.diagnostic.config {
+    virtual_text = {
+      source = 'if_many',
+      spacing = 2,
+      severity = show_warnings and nil or { min = vim.diagnostic.severity.ERROR },
+    },
+  }
+  print('Warnings: ' .. (show_warnings and 'ON' or 'OFF'))
+end, { desc = '[T]oggle [W]arnings' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -213,6 +227,20 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+-- Autosave when leaving insert mode, switching buffers, or losing focus
+vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
+  desc = 'Autosave on insert leave, buffer leave, or focus lost',
+  group = vim.api.nvim_create_augroup('autosave', { clear = true }),
+  callback = function(event)
+    local buf = event.buf
+    if vim.bo[buf].modified and vim.bo[buf].buftype == '' and vim.fn.filereadable(vim.api.nvim_buf_get_name(buf)) == 1 then
+      vim.api.nvim_buf_call(buf, function()
+        vim.cmd 'silent! write'
+      end)
+    end
   end,
 })
 
@@ -475,6 +503,14 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- Search (grep) in a specific directory
+      vim.keymap.set('n', '<leader>sD', function()
+        local dir = vim.fn.input('Directory: ', '', 'dir')
+        if dir ~= '' then
+          builtin.live_grep { search_dirs = { dir } }
+        end
+      end, { desc = '[S]earch in [D]irectory' })
     end,
   },
 
@@ -659,15 +695,7 @@ require('lazy').setup({
         virtual_text = {
           source = 'if_many',
           spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
+          severity = { min = vim.diagnostic.severity.ERROR },
         },
       }
 

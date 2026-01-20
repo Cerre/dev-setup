@@ -8,22 +8,22 @@
     {
         "key": "space s f",
         "command": "workbench.action.quickOpen",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
     {
         "key": "space s g",
         "command": "workbench.action.findInFiles",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
     {
         "key": "space space",
         "command": "workbench.action.showAllEditors",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
     {
         "key": "space s h",
         "command": "workbench.action.showCommands",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
     {
         "key": "space s w",
@@ -31,15 +31,32 @@
         "args": {
             "query": "${selectedText}"
         },
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
+    },
+    {
+        "key": "space s r",
+        "command": "search.action.focusSearchList",
+        "when": "neovim.mode == normal && editorTextFocus"
+    },
+    {
+        "key": "space s d",
+        "command": "workbench.actions.view.problems",
+        "when": "neovim.mode == normal && editorTextFocus"
+    },
+    {
+        "key": "space s .",
+        "command": "workbench.action.openRecent",
+        "when": "neovim.mode == normal && editorTextFocus"
     },
 
     // File Explorer (Oil.nvim equivalent)
+    // Press - to reveal current file in explorer and focus it
     {
         "key": "-",
-        "command": "workbench.files.action.focusFilesExplorer",
+        "command": "workbench.files.action.showActiveFileInExplorer",
         "when": "neovim.mode == normal && !filesExplorerFocus"
     },
+    // Press - again to go back to editor
     {
         "key": "-",
         "command": "workbench.action.focusActiveEditorGroup",
@@ -50,7 +67,7 @@
     {
         "key": "space /",
         "command": "actions.find",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
 
     // ============================================
@@ -105,17 +122,17 @@
     {
         "key": "space d c",
         "command": "workbench.action.debug.continue",
-        "when": "neovim.mode == normal"
+        "when": "neovim.mode == normal && editorTextFocus"
     },
     {
         "key": "space d s",
         "command": "workbench.action.debug.start",
-        "when": "neovim.mode == normal && !inDebugMode"
+        "when": "neovim.mode == normal && !inDebugMode && editorTextFocus"
     },
     {
         "key": "space d x",
         "command": "workbench.action.debug.stop",
-        "when": "neovim.mode == normal && inDebugMode"
+        "when": "neovim.mode == normal && inDebugMode && editorTextFocus"
     },
 
     // ============================================

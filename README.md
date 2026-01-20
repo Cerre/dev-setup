@@ -11,9 +11,6 @@ Personal dotfiles for Linux systems.
 sudo add-apt-repository ppa:neovim-ppa/unstable
 sudo apt update
 sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip nodejs npm xcape
-
-# Arch
-sudo pacman -S git zsh tmux neovim fzf ripgrep ruby xclip nodejs npm xcape
 ```
 
 **Optional: VS Code** (for neovim integration)
@@ -81,7 +78,4 @@ tmux
 ```bash
 # Pull updates
 cd ~/dotfiles && git pull && ./install.sh
-
-# Push changes
-cd ~/dotfiles && git add . && git commit -m "msg" && git push
 ```
