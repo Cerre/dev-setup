@@ -102,13 +102,9 @@ zle -N zle-line-init
 # Keep some emacs-style bindings for convenience
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
-bindkey '^R' history-incremental-search-backward
-
-# uv python package manager
-export PATH="$HOME/.local/bin:$PATH"
 
 # Custom PATH settings
-ZSH_CUSTOM=/home/filipc/scripts/zshcustom
+ZSH_CUSTOM=$HOME/scripts/zshcustom
 export PATH=$HOME/.fzf/bin:$HOME/bin:/usr/local/bin:$HOME/scripts:$HOME/.local/bin:$PATH
 
 # zig
@@ -121,34 +117,8 @@ export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 # Change directories from dark blue (34) to bright cyan (96)
 export LS_COLORS='di=1;96:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33:cd=1;33:su=1;31:sg=1;31:tw=1;34:ow=1;34'
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# Default editor
+export EDITOR='nvim'
 
 alias python=python3
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

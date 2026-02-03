@@ -9,13 +9,11 @@
         "asvetliakov.vscode-neovim": 1
     },
 
-    // Path to Neovim binary (adjust if needed)
+    // Path to Neovim binary
     "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
-    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
 
     // Use your actual Neovim config
     "vscode-neovim.neovimInitVimPaths.linux": "~/.config/nvim/init.lua",
-    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
 
     // Let Neovim handle these keys
     "vscode-neovim.useCtrlKeys": true,
