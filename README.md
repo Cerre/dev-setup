@@ -10,7 +10,7 @@ Personal dotfiles for Linux systems.
 # Ubuntu/Debian
 sudo add-apt-repository ppa:neovim-ppa/unstable
 sudo apt update
-sudo apt install git zsh tmux neovim fzf ripgrep ruby xclip nodejs npm xcape
+sudo apt install git zsh tmux neovim fzf ripgrep xclip nodejs npm
 ```
 
 **Optional: VS Code** (for neovim integration)

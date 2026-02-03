@@ -18,11 +18,7 @@ vscode/workspaceStorage/
 vscode/globalStorage/
 vscode/History/
 
-# Neovim plugin manager directories
-nvim/lazy-lock.json
-
 # Sensitive data
 *.secret
 *.key
 .env
-DEVOPS-COURSE.md
