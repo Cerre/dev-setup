@@ -131,6 +131,26 @@ return {
           disconnect = '⏏',
         },
       },
+      layouts = {
+        {
+          elements = {
+            { id = 'scopes', size = 0.25 },
+            { id = 'breakpoints', size = 0.25 },
+            { id = 'stacks', size = 0.25 },
+            { id = 'watches', size = 0.25 },
+          },
+          size = 80,
+          position = 'left',
+        },
+        {
+          elements = {
+            { id = 'repl', size = 0.5 },
+            { id = 'console', size = 0.5 },
+          },
+          size = 0.375,
+          position = 'bottom',
+        },
+      },
     }
 
     -- Automatically open/close DAP UI
@@ -154,5 +174,11 @@ return {
     end
 
     require('dap-python').setup(get_python_path())
+
+    -- Alias so .vscode/launch.json configs with "type": "debugpy" work
+    dap.adapters.debugpy = dap.adapters.python
+
+    -- Load .vscode/launch.json configurations
+    require('dap.ext.vscode').load_launchjs()
   end,
 }

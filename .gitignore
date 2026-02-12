@@ -17,6 +17,7 @@ Thumbs.db
 vscode/workspaceStorage/
 vscode/globalStorage/
 vscode/History/
+vscode/mcp.json
 
 # Sensitive data
 *.secret

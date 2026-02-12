@@ -181,12 +181,6 @@ bindkey '^f' _fzf_rg_search
 bindkey '^e' _fzf_tag_search
 
 # ============================================
-# Caps Lock Remapping - Now handled by keyd (system service)
-# ============================================
-# See /etc/keyd/default.conf for configuration
-# Caps Lock: Escape when tapped, Ctrl when held
-
-# ============================================
 # Quick Debug Setup for VS Code
 # ============================================
 
@@ -302,19 +296,6 @@ EOF
 
 # Alias for convenience
 alias vds='vdsetup'
-
-# ============================================
-# Yazi - Terminal File Manager
-# ============================================
-# Use 'y' to open yazi and cd to the directory on quit
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    cd -- "$cwd"
-  fi
-  rm -f -- "$tmp"
-}
 
 # ============================================
 # Zoxide - Smarter cd command

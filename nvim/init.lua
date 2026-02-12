@@ -157,6 +157,12 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
+-- Auto-reload files changed outside of Neovim
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter' }, {
+  command = 'checktime',
+})
+
 -- Show which line your cursor is on
 vim.o.cursorline = true
 
@@ -217,6 +223,15 @@ vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+
+-- Toggle zoom for current window (like tmux Ctrl-b z)
+vim.keymap.set('n', '<C-w>z', function()
+  if vim.fn.winnr '$' == 1 and vim.fn.tabpagenr '$' > 1 then
+    vim.cmd 'tabclose'
+  else
+    vim.cmd 'tab split'
+  end
+end, { desc = 'Toggle zoom window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -506,13 +521,11 @@ require('lazy').setup({
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
 
-      -- Search (grep) in a specific directory
+      -- Browse directories visually, then search in the selected one
+      -- Enter: navigate into directory | <C-f>: find files | <C-g>: live grep
       vim.keymap.set('n', '<leader>sD', function()
-        local dir = vim.fn.input('Directory: ', '', 'dir')
-        if dir ~= '' then
-          builtin.live_grep { search_dirs = { dir } }
-        end
-      end, { desc = '[S]earch in [D]irectory' })
+        require('telescope').extensions.file_browser.file_browser { path = vim.fn.getcwd() }
+      end, { desc = '[S]earch in [D]irectory (browse)' })
     end,
   },
 
