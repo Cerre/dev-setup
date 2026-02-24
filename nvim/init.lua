@@ -490,6 +490,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sF', function()
+        builtin.find_files { no_ignore = true, hidden = true }
+      end, { desc = '[S]earch All [F]iles (incl. ignored/hidden)' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -524,7 +527,7 @@ require('lazy').setup({
       -- Browse directories visually, then search in the selected one
       -- Enter: navigate into directory | <C-f>: find files | <C-g>: live grep
       vim.keymap.set('n', '<leader>sD', function()
-        require('telescope').extensions.file_browser.file_browser { path = vim.fn.getcwd() }
+        require('telescope').extensions.file_browser.file_browser { path = vim.fn.getcwd() }
       end, { desc = '[S]earch in [D]irectory (browse)' })
     end,
   },
