@@ -32,6 +32,13 @@ link_file "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 link_file "$DOTFILES_DIR/fzf/fzf.zsh" "$HOME/.fzf.zsh"
 link_file "$DOTFILES_DIR/ripgrep/ripgreprc" "$HOME/.ripgreprc"
 
+# bat is installed as batcat on Ubuntu/Debian — create a bat alias
+if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$(which batcat)" "$HOME/.local/bin/bat"
+    echo "  Linked bat -> batcat"
+fi
+
 # VS Code (optional - only if installed)
 if [ -d "$HOME/.config/Code/User" ]; then
     link_file "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json"
