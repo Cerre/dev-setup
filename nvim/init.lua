@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -161,6 +161,21 @@ vim.o.inccommand = 'split'
 vim.o.autoread = true
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter' }, {
   command = 'checktime',
+})
+
+-- Disable heavy features for large files (>1MB) to prevent lag
+vim.api.nvim_create_autocmd('BufReadPre', {
+  callback = function(args)
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+    if ok and stats and stats.size > 1024 * 1024 then
+      vim.b[args.buf].large_file = true
+      vim.cmd 'syntax off'
+      vim.opt_local.foldmethod = 'manual'
+      vim.opt_local.spell = false
+      vim.bo[args.buf].swapfile = false
+      vim.bo[args.buf].undofile = false
+    end
+  end,
 })
 
 -- Show which line your cursor is on
@@ -717,6 +732,21 @@ require('lazy').setup({
         },
       }
 
+      -- Fade unused variables by directly applying DiagnosticUnnecessary highlight
+      -- to diagnostics whose message matches basedpyright's "is not accessed" pattern.
+      local unused_ns = vim.api.nvim_create_namespace 'unused_vars_hl'
+      vim.api.nvim_create_autocmd('DiagnosticChanged', {
+        callback = function(args)
+          local bufnr = args.buf
+          vim.api.nvim_buf_clear_namespace(bufnr, unused_ns, 0, -1)
+          for _, d in ipairs(vim.diagnostic.get(bufnr)) do
+            if d.message and d.message:match 'is not accessed' then
+              vim.api.nvim_buf_add_highlight(bufnr, unused_ns, 'DiagnosticUnnecessary', d.lnum, d.col, d.end_col or -1)
+            end
+          end
+        end,
+      })
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -743,6 +773,7 @@ require('lazy').setup({
                 useLibraryCodeForTypes = true,
                 diagnosticMode = 'openFilesOnly',
                 typeCheckingMode = 'standard', -- or 'basic', 'strict'
+                reportUnusedVariable = 'hint',
               },
             },
           },
@@ -974,6 +1005,9 @@ require('lazy').setup({
 
       -- Dim inactive windows
       vim.api.nvim_set_hl(0, 'NormalNC', { bg = '#1e1e1e' })
+
+      -- Fade unused variables like VS Code (requires LSP to send Unnecessary tag)
+      vim.api.nvim_set_hl(0, 'DiagnosticUnnecessary', { fg = '#5c6370' })
     end,
   },
 

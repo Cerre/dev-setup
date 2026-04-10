@@ -14,7 +14,13 @@ return {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
+    window = {
+      mappings = {
+        ['P'] = { 'toggle_preview', config = { use_float = true, use_image_nvim = true } },
+      },
+    },
     filesystem = {
+      use_libuv_file_watcher = true,
       window = {
         mappings = {
           ['\\'] = 'close_window',

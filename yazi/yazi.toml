@@ -1,0 +1,4 @@
+[manager]
+# Ratio of parent:current:preview columns
+# Default is 2,4,3 -- make preview bigger
+ratio = [1, 2, 5]

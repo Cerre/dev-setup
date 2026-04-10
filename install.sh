@@ -39,6 +39,17 @@ if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
     echo "  Linked bat -> batcat"
 fi
 
+# Yazi file manager config
+mkdir -p "$HOME/.config/yazi"
+link_file "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
+
+# Ghostty (optional - only if config dir exists or ghostty is installed)
+if command -v ghostty &>/dev/null || [ -d "$HOME/.config/ghostty" ]; then
+    mkdir -p "$HOME/.config/ghostty"
+    link_file "$DOTFILES_DIR/ghostty/config.ghostty" "$HOME/.config/ghostty/config"
+    echo "  Ghostty config linked"
+fi
+
 # VS Code (optional - only if installed)
 if [ -d "$HOME/.config/Code/User" ]; then
     link_file "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json"
