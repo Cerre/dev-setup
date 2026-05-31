@@ -3,27 +3,11 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HOME=/root
 
-# Install prerequisites (matches README)
-RUN apt-get update && \
-    apt-get install -y software-properties-common curl && \
-    add-apt-repository -y ppa:neovim-ppa/unstable && \
-    apt-get update && \
-    apt-get install -y git zsh tmux neovim ripgrep xclip bat zoxide nodejs npm && \
-    rm -rf /var/lib/apt/lists/*
-
-# Oh My Zsh (unattended)
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-# fzf (unattended)
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
-    ~/.fzf/install --all
-
-# TPM
-RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-# Copy dotfiles and install
+# install.sh handles everything: system packages, Neovim PPA, Oh My Zsh, fzf,
+# TPM, symlinks, and plugin installation. Running it here is also our end-to-end
+# test that a clean Ubuntu box can install the dotfiles from scratch (see test.sh).
 COPY . /root/dotfiles
-RUN cd /root/dotfiles && ./install.sh
+RUN /root/dotfiles/install.sh
 
 WORKDIR /root
 RUN chsh -s /bin/zsh

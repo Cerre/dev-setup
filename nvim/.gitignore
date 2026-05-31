@@ -4,4 +4,6 @@ test.sh
 nvim
 
 spell/
-lazy-lock.json
+
+# lazy-lock.json is intentionally tracked: it pins exact plugin commits so
+# every machine installs identical plugin versions (reproducibility).

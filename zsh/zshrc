@@ -4,6 +4,9 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Disable terminal bell/beep
+unsetopt BEEP
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -106,9 +109,6 @@ bindkey '^E' end-of-line
 # Custom PATH settings
 ZSH_CUSTOM=$HOME/scripts/zshcustom
 export PATH=$HOME/.fzf/bin:$HOME/bin:/usr/local/bin:$HOME/scripts:$HOME/.local/bin:$PATH
-
-# zig
-export PATH=$PATH:~/.local/bin/zig
 
 # Ripgrep config
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
@@ -301,3 +301,9 @@ alias vds='vdsetup'
 # Zoxide - Smarter cd command
 # ============================================
 eval "$(zoxide init zsh)"
+
+# Global npm packages (configured via: npm config set prefix ~/.npm-global)
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# Machine-specific overrides (not tracked in the dotfiles repo)
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
