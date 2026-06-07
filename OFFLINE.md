@@ -6,17 +6,18 @@ go through an approval process first).
 
 This document is the **bill of materials**: every external artifact, its source,
 and its pinned version, grouped by channel. After dropping `markdown-preview.nvim`
-and `tmux-thumbs`, the install touches **five** network channels:
+and re-adding `tmux-thumbs`, the install touches **six** network channels:
 
 1. apt (Ubuntu archive + Neovim PPA)
 2. GitHub git clones
 3. GitHub release binaries
 4. npm registry
 5. PyPI
+6. crates.io (only to build `tmux-thumbs`)
 
-> The crates.io channel is **eliminated** (it was only needed to build
-> `tmux-thumbs`), and there is no longer an npm *build* step (that was
-> `markdown-preview.nvim`).
+> There is no longer an npm *build* step (that was `markdown-preview.nvim`).
+> The crates.io channel is back solely to build `tmux-thumbs`; see the
+> tmux-thumbs note under §2 for how to satisfy it offline.
 
 ---
 
@@ -59,11 +60,18 @@ Transfer the `debs/` directory, then on the offline box: `sudo dpkg -i debs/*.de
 | `junegunn/fzf` | latest (unpinned) | `~/.fzf` |
 | `tmux-plugins/tpm` | latest (unpinned) | `~/.tmux/plugins/tpm` |
 | `schasse/tmux-jump` | latest (unpinned) | `~/.tmux/plugins/tmux-jump` |
+| `fcsonline/tmux-thumbs` | latest (unpinned) | `~/.tmux/plugins/tmux-thumbs` |
 | `folke/lazy.nvim` | see `lazy-lock.json` | `~/.local/share/nvim/lazy/lazy.nvim` |
 | **~30 Neovim plugins** | **pinned in `nvim/lazy-lock.json`** | `~/.local/share/nvim/lazy/<plugin>` |
 
 `nvim/lazy-lock.json` is the authoritative, commit-pinned manifest for the
 Neovim plugins — submit it as-is for approval.
+
+**`tmux-thumbs` compiles from Rust** on first install — it needs `cargo`
+(install `rustc`/`cargo`, or `~/.cargo/bin` via rustup, and the crates it pulls
+from crates.io). In a fully air-gapped setup either pre-build it on a connected
+host and copy `~/.tmux/plugins/tmux-thumbs`, or vendor its crates. Its clipboard
+hooks shell out to `xclip` and `xdg-open`.
 
 **Treesitter grammars** are also git-fetched and compiled (needs the C compiler
 from `build-essential`). The config installs these languages:
