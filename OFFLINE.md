@@ -26,7 +26,7 @@ and re-adding `tmux-thumbs`, the install touches **six** network channels:
 Top-level packages (transitive dependencies are resolved by apt):
 
 ```
-git zsh tmux neovim ripgrep xclip bat zoxide nodejs npm curl
+git zsh tmux neovim ripgrep fd-find xclip bat zoxide nodejs npm curl
 software-properties-common make build-essential python3 python3-venv ruby
 fonts-jetbrains-mono
 ```
@@ -42,7 +42,7 @@ sudo add-apt-repository -y ppa:neovim-ppa/unstable && sudo apt-get update
 mkdir debs && cd debs
 apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
   --no-conflicts --no-breaks --no-replaces --no-enhances \
-  git zsh tmux neovim ripgrep xclip bat zoxide nodejs npm curl \
+  git zsh tmux neovim ripgrep fd-find xclip bat zoxide nodejs npm curl \
   software-properties-common make build-essential python3 python3-venv ruby \
   fonts-jetbrains-mono | grep '^\w' | sort -u)
 ```
@@ -62,7 +62,7 @@ Transfer the `debs/` directory, then on the offline box: `sudo dpkg -i debs/*.de
 | `schasse/tmux-jump` | latest (unpinned) | `~/.tmux/plugins/tmux-jump` |
 | `fcsonline/tmux-thumbs` | latest (unpinned) | `~/.tmux/plugins/tmux-thumbs` |
 | `folke/lazy.nvim` | see `lazy-lock.json` | `~/.local/share/nvim/lazy/lazy.nvim` |
-| **~30 Neovim plugins** | **pinned in `nvim/lazy-lock.json`** | `~/.local/share/nvim/lazy/<plugin>` |
+| **~40 Neovim plugins** | **pinned in `nvim/lazy-lock.json`** | `~/.local/share/nvim/lazy/<plugin>` |
 
 `nvim/lazy-lock.json` is the authoritative, commit-pinned manifest for the
 Neovim plugins — submit it as-is for approval.
@@ -96,6 +96,7 @@ offline — lazy will check out the pinned commits without fetching.
 | Artifact | Source | Notes |
 |---|---|---|
 | `fzf` binary | `junegunn/fzf` releases | fetched by `~/.fzf/install`; match OS/arch |
+| `lazygit` binary | `jesseduffield/lazygit` releases | pinned to `LAZYGIT_VERSION` in `install.sh`; installed to `/usr/local/bin`; used by snacks.nvim git UI |
 | `lua-language-server` | `LuaLS/lua-language-server` releases | via Mason |
 | `stylua` | `JohnnyMorganz/StyLua` releases | via Mason |
 | JetBrainsMono Nerd Font | `ryanoasis/nerd-fonts` releases | *optional* — only if you want the patched Nerd Font instead of the apt `fonts-jetbrains-mono` package |

@@ -126,6 +126,12 @@ vim.o.breakindent = true
 -- Save undo history
 vim.o.undofile = true
 
+-- Don't interrupt with the swap-file "ATTENTION" (E325) prompt. The debugger
+-- (nvim-dap's jump_to_frame) and opening a file that's already open elsewhere
+-- both trigger it; combined with autosave above, swap files add little here, so
+-- we silence the prompt instead of letting it break the debug-step flow.
+vim.opt.shortmess:append 'A'
+
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -199,19 +205,18 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Toggle warning visibility (errors always visible)
-local show_warnings = false
+-- Toggle the inline diagnostic display (rendered by tiny-inline-diagnostic.nvim).
+-- Quick way to mute all the squiggle text when you want a clean buffer.
 vim.keymap.set('n', '<leader>tw', function()
-  show_warnings = not show_warnings
-  vim.diagnostic.config {
-    virtual_text = {
-      source = 'if_many',
-      spacing = 2,
-      severity = show_warnings and nil or { min = vim.diagnostic.severity.ERROR },
-    },
-  }
-  print('Warnings: ' .. (show_warnings and 'ON' or 'OFF'))
-end, { desc = '[T]oggle [W]arnings' })
+  local ok, tid = pcall(require, 'tiny-inline-diagnostic')
+  if ok then
+    tid.toggle()
+  else
+    -- Fallback if the plugin isn't loaded yet: toggle native virtual text
+    local cfg = vim.diagnostic.config()
+    vim.diagnostic.config { virtual_text = not cfg.virtual_text }
+  end
+end, { desc = '[T]oggle inline diagnostics ([W]arnings)' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -542,7 +547,7 @@ require('lazy').setup({
       -- Browse directories visually, then search in the selected one
       -- Enter: navigate into directory | <C-f>: find files | <C-g>: live grep
       vim.keymap.set('n', '<leader>sD', function()
-        require('telescope').extensions.file_browser.file_browser { path = vim.fn.getcwd() }
+        require('telescope').extensions.file_browser.file_browser { path = vim.fn.getcwd() }
       end, { desc = '[S]earch in [D]irectory (browse)' })
     end,
   },
@@ -725,11 +730,9 @@ require('lazy').setup({
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
         } or {},
-        virtual_text = {
-          source = 'if_many',
-          spacing = 2,
-          severity = { min = vim.diagnostic.severity.ERROR },
-        },
+        -- Native virtual text is OFF: tiny-inline-diagnostic.nvim (custom/plugins/ide.lua)
+        -- renders diagnostics on the current line in a clean, VS Code-like style.
+        virtual_text = false,
       }
 
       -- Fade unused variables by directly applying DiagnosticUnnecessary highlight
@@ -772,7 +775,7 @@ require('lazy').setup({
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
                 diagnosticMode = 'openFilesOnly',
-                typeCheckingMode = 'standard', -- or 'basic', 'strict'
+                typeCheckingMode = 'basic', -- 'off' | 'basic' | 'standard' | 'strict' — 'basic' is much quieter than 'standard'
                 reportUnusedVariable = 'hint',
               },
             },
@@ -994,6 +997,7 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'tanvirtin/monokai.nvim',
+    enabled = false, -- Replaced by vscode.nvim in custom/plugins/ide.lua. Kept as a fallback theme.
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       require('monokai').setup {
@@ -1032,20 +1036,16 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
+      -- NOTE: mini.statusline is intentionally disabled — lualine.nvim
+      -- (custom/plugins/ide.lua) now provides a richer VS Code-like statusline.
+      -- Re-enable by uncommenting the block below if you remove lualine.
+      --
+      -- local statusline = require 'mini.statusline'
+      -- statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- ---@diagnostic disable-next-line: duplicate-set-field
+      -- statusline.section_location = function()
+      --   return '%2l:%-2v'
+      -- end
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim

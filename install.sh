@@ -42,13 +42,34 @@ install_packages() {
 
     $SUDO apt-get install -y \
         git zsh tmux neovim \
-        ripgrep xclip bat zoxide \
+        ripgrep fd-find xclip bat zoxide \
         nodejs npm \
         make build-essential \
         python3 python3-venv \
         ruby \
         fonts-jetbrains-mono
+
+    # lazygit (terminal git UI) is not in the Ubuntu archive — fetch the pinned
+    # release binary. Skipped if already present.
+    if ! command -v lazygit >/dev/null 2>&1; then
+        echo "==> Installing lazygit $LAZYGIT_VERSION..."
+        local arch tmp
+        arch="$(uname -m)"
+        case "$arch" in
+            x86_64) arch="x86_64" ;;
+            aarch64 | arm64) arch="arm64" ;;
+        esac
+        tmp="$(mktemp -d)"
+        curl -fsSL -o "$tmp/lazygit.tar.gz" \
+            "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${arch}.tar.gz"
+        tar -xf "$tmp/lazygit.tar.gz" -C "$tmp" lazygit
+        $SUDO install "$tmp/lazygit" /usr/local/bin/lazygit
+        rm -rf "$tmp"
+    fi
 }
+
+# Pinned lazygit version (see OFFLINE.md, channel 3).
+LAZYGIT_VERSION="0.44.1"
 
 if [ -z "${SKIP_APT:-}" ]; then
     install_packages
@@ -111,6 +132,14 @@ if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
     mkdir -p "$HOME/.local/bin"
     ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
     echo "  Linked bat -> batcat"
+fi
+
+# fd is installed as fdfind on Ubuntu/Debian — create an fd alias on PATH.
+# Telescope and telescope-file-browser use fd for fast, gitignore-aware file finding.
+if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+    echo "  Linked fd -> fdfind"
 fi
 
 # Yazi file manager config
