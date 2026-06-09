@@ -153,6 +153,32 @@ if command -v ghostty >/dev/null 2>&1 || [ -d "$HOME/.config/ghostty" ]; then
     echo "  Ghostty config linked"
 fi
 
+# Bind Ctrl+Alt+T to Ghostty on GNOME (replaces the built-in gnome-terminal
+# launcher). Only runs on a GNOME desktop (gsettings + media-keys schema) with
+# Ghostty installed. Idempotent: re-running just re-asserts the same values.
+if command -v ghostty >/dev/null 2>&1 && command -v gsettings >/dev/null 2>&1 \
+    && gsettings list-schemas 2>/dev/null | grep -qx 'org.gnome.settings-daemon.plugins.media-keys'; then
+    echo "==> Binding Ctrl+Alt+T -> Ghostty (GNOME)..."
+    mk='org.gnome.settings-daemon.plugins.media-keys'
+    kb_path='/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ghostty/'
+
+    # Free Ctrl+Alt+T from the built-in gnome-terminal launcher.
+    gsettings set "$mk" terminal "[]" 2>/dev/null || true
+
+    # Register our custom slot without clobbering any other custom keybindings.
+    current="$(gsettings get "$mk" custom-keybindings)"
+    case "$current" in
+        *"$kb_path"*) : ;;                                     # already registered
+        '@as []' | '[]') gsettings set "$mk" custom-keybindings "['$kb_path']" ;;
+        *) gsettings set "$mk" custom-keybindings "${current%]*}, '$kb_path']" ;;
+    esac
+
+    gsettings set "$mk.custom-keybinding:$kb_path" name 'Ghostty'
+    gsettings set "$mk.custom-keybinding:$kb_path" command "$(command -v ghostty)"
+    gsettings set "$mk.custom-keybinding:$kb_path" binding '<Control><Alt>t'
+    echo "  Ctrl+Alt+T bound to Ghostty"
+fi
+
 # VS Code (optional - only if installed)
 if [ -d "$HOME/.config/Code/User" ]; then
     link_file "$DOTFILES_DIR/vscode/settings.json" "$HOME/.config/Code/User/settings.json"
