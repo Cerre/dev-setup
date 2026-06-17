@@ -27,7 +27,7 @@ if [ "$(id -u)" -ne 0 ]; then SUDO="sudo"; fi
 # Top-level apt packages (transitive deps resolved below). Mirrors install.sh.
 PKGS="git zsh tmux neovim ripgrep fd-find xclip bat zoxide nodejs npm curl
 software-properties-common make build-essential python3 python3-venv ruby
-fonts-jetbrains-mono"
+imagemagick fonts-jetbrains-mono"
 
 echo "==> [1/6] Building the dotfiles environment..."
 "$DOTFILES_DIR/install.sh"

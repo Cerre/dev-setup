@@ -47,6 +47,7 @@ install_packages() {
         make build-essential \
         python3 python3-venv \
         ruby \
+        imagemagick \
         fonts-jetbrains-mono
 
     # lazygit (terminal git UI) is not in the Ubuntu archive — fetch the pinned

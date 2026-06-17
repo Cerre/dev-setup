@@ -12,6 +12,11 @@
 -- file -- i.e. "hover to see the image". Press `P` again or `<Esc>` to close.
 return {
   '3rd/image.nvim',
+  -- We use the ImageMagick CLI (see opts.processor below), not the `magick`
+  -- luarock, so skip lazy.nvim's luarocks/hererocks build step entirely. Without
+  -- this, lazy retries the failing rock build on every startup ("Too many rounds
+  -- of missing plugins") — pure noise, and a hang risk on an air-gapped box.
+  build = false,
   ft = { 'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif' },
   -- Also load eagerly enough that neo-tree's preview can find it on demand.
   lazy = false,
