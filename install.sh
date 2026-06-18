@@ -47,6 +47,7 @@ install_packages() {
         make build-essential \
         python3 python3-venv \
         ruby \
+        imagemagick \
         fonts-jetbrains-mono
 
     # lazygit (terminal git UI) is not in the Ubuntu archive — fetch the pinned
@@ -66,10 +67,29 @@ install_packages() {
         $SUDO install "$tmp/lazygit" /usr/local/bin/lazygit
         rm -rf "$tmp"
     fi
+
+    # tree-sitter CLI: the nvim-treesitter (main branch) build shells out to it
+    # to compile grammars. Not in the Ubuntu archive — fetch the pinned release
+    # binary. Without it, treesitter highlighting silently never builds.
+    if ! command -v tree-sitter >/dev/null 2>&1; then
+        echo "==> Installing tree-sitter CLI $TREE_SITTER_VERSION..."
+        local ts_arch tmp
+        case "$(uname -m)" in
+            x86_64) ts_arch="x64" ;;
+            aarch64 | arm64) ts_arch="arm64" ;;
+        esac
+        tmp="$(mktemp -d)"
+        curl -fsSL -o "$tmp/tree-sitter.gz" \
+            "https://github.com/tree-sitter/tree-sitter/releases/download/v${TREE_SITTER_VERSION}/tree-sitter-linux-${ts_arch}.gz"
+        gunzip -c "$tmp/tree-sitter.gz" > "$tmp/tree-sitter"
+        $SUDO install "$tmp/tree-sitter" /usr/local/bin/tree-sitter
+        rm -rf "$tmp"
+    fi
 }
 
-# Pinned lazygit version (see OFFLINE.md, channel 3).
+# Pinned release-binary versions (see OFFLINE.md, channel 3).
 LAZYGIT_VERSION="0.44.1"
+TREE_SITTER_VERSION="0.26.3"
 
 if [ -z "${SKIP_APT:-}" ]; then
     install_packages

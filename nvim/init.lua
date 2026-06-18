@@ -1058,8 +1058,10 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
+      -- Disabled so an air-gapped Neovim never tries to fetch a missing grammar
+      -- (offline installs ship the `ensure_installed` parsers prebuilt). Set back
+      -- to `true` on a networked machine if you want grammars auto-installed.
+      auto_install = false,
       highlight = {
         enable = true,
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.

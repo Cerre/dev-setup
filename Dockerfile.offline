@@ -1,0 +1,13 @@
+# Build the offline-install bundle in a clean ubuntu:24.04 (amd64) container,
+# so staging never touches the host. Driven by stage-offline-docker.sh.
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME=/root
+
+COPY . /root/dotfiles
+
+# stage-offline.sh runs the full install, then assembles the single bundle file.
+RUN OUT=/dotfiles-offline-bundle.tar /root/dotfiles/stage-offline.sh
+
+# The bundle now lives at /dotfiles-offline-bundle.tar; the wrapper copies it out.
