@@ -1,155 +1,155 @@
 # Offline / air-gapped install
 
-This repo normally pulls from the internet during install. In an air-gapped
-environment every artifact must be staged ahead of time (and, in your case,
-go through an approval process first).
+This repo normally pulls from the internet during install. For an air-gapped
+machine, everything is staged ahead of time into **one self-contained bundle
+file**, transferred across, and restored with no network access.
 
-This document is the **bill of materials**: every external artifact, its source,
-and its pinned version, grouped by channel. After dropping `markdown-preview.nvim`
-and re-adding `tmux-thumbs`, the install touches **six** network channels:
-
-1. apt (Ubuntu archive + Neovim PPA)
-2. GitHub git clones
-3. GitHub release binaries
-4. npm registry
-5. PyPI
-6. crates.io (only to build `tmux-thumbs`)
-
-> There is no longer an npm *build* step (that was `markdown-preview.nvim`).
-> The crates.io channel is back solely to build `tmux-thumbs`; see the
-> tmux-thumbs note under §2 for how to satisfy it offline.
-
----
-
-## 1. apt — system packages
-
-Top-level packages (transitive dependencies are resolved by apt):
-
-```
-git zsh tmux neovim ripgrep fd-find xclip bat zoxide nodejs npm curl
-software-properties-common make build-essential python3 python3-venv ruby
-fonts-jetbrains-mono
-```
-
-- **`neovim`** comes from `ppa:neovim-ppa/unstable` (0.11+), *not* the Ubuntu
-  archive. You must approve/mirror that PPA, or stage the `.deb` directly.
-
-**Staging:** on an internet-connected Ubuntu box of the **same release and CPU
-architecture**, download the packages plus their dependency closure:
+The whole flow is two scripts:
 
 ```bash
-sudo add-apt-repository -y ppa:neovim-ppa/unstable && sudo apt-get update
-mkdir debs && cd debs
-apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
-  --no-conflicts --no-breaks --no-replaces --no-enhances \
-  git zsh tmux neovim ripgrep fd-find xclip bat zoxide nodejs npm curl \
-  software-properties-common make build-essential python3 python3-venv ruby \
-  fonts-jetbrains-mono | grep '^\w' | sort -u)
+# 1. ONLINE box (Docker or Podman): build the bundle in a clean container.
+./stage-offline-docker.sh          # -> dotfiles-offline-bundle.tar  (one file)
+
+# 2. Transfer that one file to the OFFLINE box, then:
+mkdir ~/offline && tar xf dotfiles-offline-bundle.tar -C ~/offline
+~/offline/repo/restore-offline.sh  # installs everything, no network
+chsh -s "$(which zsh)"             # then log out / back in
 ```
 
-Transfer the `debs/` directory, then on the offline box: `sudo dpkg -i debs/*.deb`
-(or serve it as a local apt repo).
+The bundle contains the repo itself, so you do **not** need to transfer the git
+repo separately. `install.sh` symlinks configs *into* the repo, so the repo
+files must live permanently on the offline box — `restore-offline.sh` places
+them at `~/dotfiles` (override with `DOTFILES_DEST=/path`).
+
+> Verified end-to-end: `restore-offline.sh` runs on a bare `ubuntu:24.04`
+> container with `--network none` and produces a working setup (41 nvim plugins,
+> 11 treesitter parsers, 7 Mason tools, all CLIs on `PATH`).
 
 ---
 
-## 2. GitHub — git clones
+## Requirements
 
-| Repo | Pin | Where it lands |
-|---|---|---|
-| `ohmyzsh/ohmyzsh` | latest (unpinned) | `~/.oh-my-zsh` |
-| `junegunn/fzf` | latest (unpinned) | `~/.fzf` |
-| `tmux-plugins/tpm` | latest (unpinned) | `~/.tmux/plugins/tpm` |
-| `schasse/tmux-jump` | latest (unpinned) | `~/.tmux/plugins/tmux-jump` |
-| `fcsonline/tmux-thumbs` | latest (unpinned) | `~/.tmux/plugins/tmux-thumbs` |
-| `folke/lazy.nvim` | see `lazy-lock.json` | `~/.local/share/nvim/lazy/lazy.nvim` |
-| **~40 Neovim plugins** | **pinned in `nvim/lazy-lock.json`** | `~/.local/share/nvim/lazy/<plugin>` |
+The online staging box must match the offline target on **all three**:
 
-`nvim/lazy-lock.json` is the authoritative, commit-pinned manifest for the
-Neovim plugins — submit it as-is for approval.
-
-**`tmux-thumbs` compiles from Rust** on first install — it needs `cargo`
-(install `rustc`/`cargo`, or `~/.cargo/bin` via rustup, and the crates it pulls
-from crates.io). In a fully air-gapped setup either pre-build it on a connected
-host and copy `~/.tmux/plugins/tmux-thumbs`, or vendor its crates. Its clipboard
-hooks shell out to `xclip` and `xdg-open`.
-
-**Treesitter grammars** are also git-fetched and compiled (needs the C compiler
-from `build-essential`). The config installs these languages:
-
-```
-bash c diff html lua luadoc markdown markdown_inline query vim vimdoc
-```
-
-(Plus any others on first edit, because `auto_install = true` in
-`nvim/init.lua`. For a strict air-gap, set `auto_install = false` so Neovim never
-tries to fetch a missing grammar.)
-
-**Staging:** clone each repo on the online machine and copy it to the matching
-path above. Because `lazy-lock.json` pins commits, place the plugin repos under
-`~/.local/share/nvim/lazy/` and run `nvim --headless "+Lazy! restore" +qa`
-offline — lazy will check out the pinned commits without fetching.
-
----
-
-## 3. GitHub — release binaries (prebuilt)
-
-| Artifact | Source | Notes |
-|---|---|---|
-| `fzf` binary | `junegunn/fzf` releases | fetched by `~/.fzf/install`; match OS/arch |
-| `lazygit` binary | `jesseduffield/lazygit` releases | pinned to `LAZYGIT_VERSION` in `install.sh`; installed to `/usr/local/bin`; used by snacks.nvim git UI |
-| `lua-language-server` | `LuaLS/lua-language-server` releases | via Mason |
-| `stylua` | `JohnnyMorganz/StyLua` releases | via Mason |
-| JetBrainsMono Nerd Font | `ryanoasis/nerd-fonts` releases | *optional* — only if you want the patched Nerd Font instead of the apt `fonts-jetbrains-mono` package |
-
----
-
-## 4. npm registry
-
-| Package | Installed by |
+| Attribute | Why |
 |---|---|
-| `dockerfile-language-server-nodejs` | Mason (`dockerls`) |
+| **CPU architecture** (e.g. both `amd64`) | the bundle ships compiled binaries + arch-specific `.deb`s |
+| **Ubuntu release** (e.g. both `24.04` / noble) | the `.deb` set is release-specific |
+| **glibc ≥ staging box's** | binaries compiled on staging must load on the target |
+
+Check both boxes with:
+
+```bash
+echo "arch:    $(uname -m) / $(dpkg --print-architecture)"
+echo "release: $(. /etc/os-release; echo "$VERSION_ID $VERSION_CODENAME")"
+echo "glibc:   $(ldd --version | head -1 | grep -oE '[0-9]+\.[0-9]+$')"
+```
+
+Build on the box with the **older** glibc if they differ. A clean offline image
+of the same release is the easy case — everything matches.
 
 ---
 
-## 5. PyPI
+## What's in the bundle
 
-| Package | Installed by |
+`stage-offline.sh` assembles a single tar with this layout:
+
+| Entry | Contents |
 |---|---|
-| `basedpyright` | Mason |
-| `debugpy` | mason-nvim-dap |
+| `debs/` + `debs/Packages.gz` | the apt dependency closure, indexed as a local apt repo |
+| `pkgs.txt` | the top-level apt package set (what restore asks apt to install) |
+| `home.tgz` | the built `$HOME` state (see below) |
+| `usr-local-bin/` | the `lazygit` and `tree-sitter` binaries |
+| `repo/` | a copy of this repo (the symlink targets + the restore script) |
+
+`home.tgz` captures everything that is normally fetched/compiled on first use:
+
+- `~/.oh-my-zsh`, `~/.fzf`, `~/.tmux/plugins` (incl. the **compiled** `tmux-thumbs`
+  Rust binary)
+- `~/.local/share/nvim` — all ~40 lazy.nvim plugins at their `lazy-lock.json`
+  commits, the **compiled treesitter grammars**, and the **Mason** tools
+  (`basedpyright`, `lua-language-server`, `stylua`, `dockerfile-language-server`,
+  `debugpy`)
+- `~/.local/bin`, `~/.local/share/fonts` (if present)
 
 ---
 
-## Mason note
+## How staging works (`stage-offline.sh`)
 
-Items in channels 3–5 are all pulled by **Mason** into
-`~/.local/share/nvim/mason/`. Two ways to satisfy them offline:
+Run inside a clean `ubuntu:24.04` container by `stage-offline-docker.sh` (so it
+never touches your host). Steps:
 
-- **Pre-populate** `~/.local/share/nvim/mason/` from a machine where you ran
-  `:Mason` online, and copy it across; or
-- **Skip Mason** entirely: install `basedpyright`, `lua-language-server`,
-  `stylua`, `debugpy`, and `dockerfile-language-server-nodejs` through your
-  approved apt/pip/npm mirrors and point Neovim at them directly (drop the
-  `ensure_installed` lists in `nvim/init.lua` and `nvim/lua/custom/plugins/debug.lua`).
+1. **Run `install.sh`** — installs system packages, bootstraps Oh My Zsh / fzf /
+   TPM, symlinks configs, restores nvim plugins to locked commits, and (new)
+   installs the pinned `tree-sitter` CLI + `lazygit` binaries.
+2. **Compile `tmux-thumbs`** — it ships Rust source only and TPM does not build
+   it, so staging installs `cargo` and runs `cargo build --release`. (The offline
+   box receives the built binary and never needs cargo.)
+3. **Realize async artifacts** (`offline-realize.lua`) — `Lazy! restore` does
+   *not* produce treesitter grammars or Mason tools. This installs the
+   `ensure_installed` grammars via `require('nvim-treesitter').install(...)` and
+   the Mason tools, **blocking on real `install:success` events** (Mason's
+   `is_installed()` flips true too early and would ship half-installed packages).
+4. **Verify on disk** — fail the build unless the `tmux-thumbs` binary, ≥11
+   treesitter parsers, and all 5 Mason launchers are physically present.
+5. **Download the apt closure + index it** — `apt-cache depends --recurse`
+   over-collects (it grabs every alternative, e.g. `make` + `make-guile`), so the
+   debs are published as a local repo (`dpkg-scanpackages` → `Packages.gz`) and
+   apt's solver picks a consistent subset at restore time. `pkgs.txt` records the
+   top-level set.
+6. **Bundle** — archive `home.tgz` + `usr-local-bin/` + `repo/` + `debs/` into the
+   single output file.
 
 ---
 
-## Pragmatic approach: golden-image transfer
+## How restore works (`restore-offline.sh`)
 
-If your process allows transferring a built home directory rather than approving
-each upstream individually, the simplest path is:
+Runs from inside the unpacked bundle (`~/offline/repo/restore-offline.sh`), no
+network. Steps:
 
-1. On an **online** machine with the **same Ubuntu release and architecture**,
-   run `./install.sh` and open `nvim` once (let Mason + Treesitter finish).
-2. Archive the produced state:
-   ```bash
-   tar czf dotfiles-bundle.tgz \
-     ~/.oh-my-zsh ~/.fzf ~/.tmux/plugins \
-     ~/.local/share/nvim ~/.local/bin \
-     ~/.local/share/fonts /var/cache/apt/archives/*.deb
-   ```
-3. On the **offline** machine: install the `.deb`s, unpack the archive into
-   `$HOME`, clone this repo, and run `SKIP_APT=1 SKIP_PLUGINS=1 ./install.sh`
-   to lay down the symlinks.
+1. **Install system packages** — point apt at *only* the local `file://` repo
+   (`Dir::Etc::SourceParts=/dev/null`, so it never reaches the network) and
+   `apt-get install <pkgs.txt>`. `APT::Sandbox::User=root` lets apt read the local
+   repo (the unprivileged `_apt` user otherwise gets Permission denied).
+2. **Restore `$HOME` + binaries** — unpack `home.tgz` into `$HOME`, install the
+   `lazygit` / `tree-sitter` binaries to `/usr/local/bin`.
+3. **Place the repo** — copy `repo/` to `~/dotfiles` (the permanent symlink
+   targets).
+4. **Symlink configs** — `SKIP_APT=1 SKIP_PLUGINS=1 install.sh` lays down the
+   symlinks only; all the bootstrap/plugin dirs already exist, so nothing is
+   fetched.
 
-Everything in the bundle is version-locked to what you approved and tested.
+---
+
+## Per-artifact approval (Artifactory / mirrors)
+
+If your process requires approving each upstream rather than transferring a built
+bundle, these are the channels and pins:
+
+- **apt:** the package set in `install.sh` (`git zsh tmux neovim ripgrep fd-find
+  xclip bat zoxide nodejs npm curl software-properties-common make
+  build-essential python3 python3-venv ruby imagemagick fonts-jetbrains-mono`),
+  with `neovim` from `ppa:neovim-ppa/unstable` (0.11+).
+- **GitHub git clones:** Oh My Zsh, fzf, TPM, `schasse/tmux-jump`,
+  `fcsonline/tmux-thumbs`, `folke/lazy.nvim`, and the ~40 plugins pinned in
+  `nvim/lazy-lock.json` (the authoritative manifest).
+- **GitHub release binaries:** `lazygit` (`LAZYGIT_VERSION` in `install.sh`),
+  `tree-sitter` CLI (`TREE_SITTER_VERSION`).
+- **crates.io:** only to build `tmux-thumbs`.
+- **PyPI (via Mason):** `basedpyright`, `debugpy`.
+- **npm (via Mason):** `dockerfile-language-server-nodejs`.
+- **Treesitter grammars:** fetched + compiled by the `tree-sitter` CLI.
+
+---
+
+## Caveats
+
+- The end-to-end test runs **as root in a container** (`$HOME=/root`, no `sudo`).
+  On a real box you run as a normal user; the apt and `/usr/local/bin` steps then
+  go through `sudo` (the scripts already detect this). A real-VM dry run closes
+  that last gap.
+- Treesitter highlighting is verified by parser *presence*, not by an interactive
+  render.
+- `nvim/init.lua` sets `auto_install = false` so an offline Neovim never tries to
+  fetch a missing grammar. Set it back to `true` on a networked machine if you
+  want grammars auto-installed.
