@@ -1,2 +1,14 @@
 .git
 dotfiles-offline-bundle.tar
+
+# Never let local/personal or secret files enter the build context (COPY .
+# does NOT honor .gitignore, so these must be listed explicitly).
+.claude/
+**/settings.local.json
+vscode/mcp.json
+nvim/doc/tags
+*.key
+*.pem
+.env
+.env.*
+.zshrc.local
