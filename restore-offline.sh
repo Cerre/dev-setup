@@ -27,10 +27,26 @@ if [ ! -d "$BUNDLE_ROOT/debs" ]; then
     exit 1
 fi
 
-echo "==> [1/4] Installing system packages from staged .debs..."
-# The leading path makes apt treat these as local files; it resolves install
-# order within the closure itself.
-$SUDO apt-get install -y "$BUNDLE_ROOT"/debs/*.deb
+echo "==> [1/4] Installing system packages from the local apt repo..."
+# Publish the staged .debs as a local (file://) apt repo and let apt's solver
+# pick a consistent subset for the top-level packages. Installing every .deb
+# directly would deadlock: --recurse staged conflicting alternatives (make vs
+# make-guile, libluajit vs libluajit2, ...). We point apt at ONLY this repo
+# (SourceParts=/dev/null) so it never reaches the network.
+offline_list="$(mktemp)"
+echo "deb [trusted=yes] file://$BUNDLE_ROOT/debs ./" > "$offline_list"
+# APT::Sandbox::User=root: apt normally drops to the unprivileged _apt user to
+# fetch, which then can't read a local file:// repo (Permission denied). For a
+# trusted local repo, fetch as root instead.
+apt_opts=(
+    -o "Dir::Etc::SourceList=$offline_list"
+    -o "Dir::Etc::SourceParts=/dev/null"
+    -o "APT::Sandbox::User=root"
+)
+$SUDO apt-get "${apt_opts[@]}" update
+# shellcheck disable=SC2046
+$SUDO apt-get "${apt_opts[@]}" install -y $(cat "$BUNDLE_ROOT/pkgs.txt")
+rm -f "$offline_list"
 
 echo "==> [2/4] Restoring built \$HOME state + /usr/local/bin binaries..."
 tar xzf "$BUNDLE_ROOT/home.tgz" -C "$HOME"

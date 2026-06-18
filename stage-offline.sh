@@ -67,17 +67,27 @@ for launcher in basedpyright-langserver lua-language-server stylua docker-langse
 done
 echo "    tmux-thumbs binary OK; $ts_parsers treesitter parsers; all mason launchers present."
 
-echo "==> [5/6] Downloading apt dependency closure..."
+echo "==> [5/6] Downloading apt dependency closure + building local repo..."
 $SUDO add-apt-repository -y ppa:neovim-ppa/unstable
 $SUDO apt-get update
+$SUDO apt-get install -y dpkg-dev   # for dpkg-scanpackages (local repo index)
 mkdir -p "$STAGE/debs"
 (
   cd "$STAGE/debs"
+  # --recurse over-collects: it pulls every ALTERNATIVE in each dependency
+  # chain (e.g. make + make-guile, libluajit + libluajit2), which mutually
+  # conflict. That's fine — we don't dpkg -i them all; we publish them as a
+  # local apt repo and let apt's solver pick a consistent subset on restore.
   # shellcheck disable=SC2046
   apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
     --no-conflicts --no-breaks --no-replaces --no-enhances $PKGS \
     | grep '^\w' | sort -u)
+  # Index the dir as an apt repo (Filename: paths are ./pkg.deb).
+  dpkg-scanpackages . /dev/null 2>/dev/null | gzip -9c > Packages.gz
 )
+# Record the top-level package set so restore installs exactly these and lets
+# apt resolve the rest from the local repo.
+printf '%s\n' $PKGS > "$STAGE/pkgs.txt"
 
 echo "==> [6/6] Archiving \$HOME state + lazygit + repo, then bundling..."
 HOME_PATHS=(.oh-my-zsh .fzf .tmux/plugins .local/share/nvim .local/bin)
